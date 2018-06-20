@@ -1,0 +1,10 @@
+#Ignore config files for unused platforms
+Configs/Default/Android/
+Configs/Default/iOS/
+Configs/Default/Linux/
+Configs/Default/Mac/
+Configs/Default/tizen/
+Configs/Default/windows/
+Configs/Default/Windows8/
+Configs/Default/WindowsUAP/
+Configs/Default/WinPhone/
