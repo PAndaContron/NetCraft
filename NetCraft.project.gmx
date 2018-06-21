@@ -16,6 +16,10 @@
   <paths name="paths"/>
   <scripts name="scripts">
     <script>scripts\array_create_2d.gml</script>
+    <script>scripts\chunk_create.gml</script>
+    <script>scripts\chunk_generate.gml</script>
+    <script>scripts\chunk_model_create.gml</script>
+    <script>scripts\array_clone.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\fnt_debug</font>
