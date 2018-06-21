@@ -9,16 +9,21 @@
   </NewExtensions>
   <sounds name="sound"/>
   <sprites name="sprites">
+    <sprite>sprites\spr_grass_top</sprite>
     <sprite>sprites\spr_test</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
+  <scripts name="scripts">
+    <script>scripts\array_create_2d.gml</script>
+  </scripts>
   <fonts name="fonts">
     <font>fonts\fnt_debug</font>
   </fonts>
   <objects name="objects">
     <object>objects\obj_cont</object>
     <object>objects\obj_player</object>
+    <object>objects\obj_block_cont</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rm_game</room>
