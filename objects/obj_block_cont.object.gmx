@@ -28,17 +28,24 @@
             <string>/// Create block container data structures
 // Each chunk will be an list of arrays representing each layer
 render_distance = 8;
-world = ds_map_create()
-world_models = ds_map_create()
+world = ds_map_create();
+world_models = ds_map_create();
 for(var i=-render_distance; i &lt; render_distance; i++) {
     for(var j=-render_distance; j &lt; render_distance; j++) {
         var coords;
         coords[0] = i;
         coords[1] = j;
         var chunk = chunk_create();
-        ds_map_add(world, coords, chunk);
+        world[? coords] = chunk;
         chunk_generate(i, j, chunk);
-        ds_map_add(world_models, coords, chunk_model_create(world, coords));
+    }
+}
+for(var i=-render_distance; i &lt; render_distance; i++) {
+    for(var j=-render_distance; j &lt; render_distance; j++) {
+        var coords;
+        coords[0] = i;
+        coords[1] = j;
+        world_models[? coords] = chunk_model_create(world, coords);
     }
 }
 
@@ -81,6 +88,80 @@ ds_map_destroy(world_models);
         </arguments>
       </action>
     </event>
+    <event eventtype="3" enumb="1">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Update loaded chunks
+/*
+var current = ds_map_find_first(loaded_chunks);
+for(var i=0; i &lt; ds_map_size(loaded_chunks); i++) {
+    if(current[0] - (player.x div 16) &gt; render_distance || current[1] - (player.y div 16) &gt; render_distance) {
+        ds_map_delete(loaded_chunks, current);
+    }
+    current = ds_map_find_next(loaded_chunks, current);
+}
+for(var i=-render_distance; i &lt; render_distance; i++) {
+    for(var j=-render_distance; j &lt; render_distance; j++) {
+        
+    }
+}*/
+
+model_queue = ds_list_create();
+player_chunk_x = floor(obj_player.x / 16)
+player_chunk_y = floor(obj_player.y / 16)
+for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance; i++) {
+    for(var j=player_chunk_y-render_distance; j &lt; player_chunk_y+render_distance; j++) {
+        var coords;
+        coords[0] = i;
+        coords[1] = j;
+        if(is_undefined(world[? coords])) {
+            var new_chunk = chunk_create();
+            world[? coords] = new_chunk;
+            chunk_generate(i, j, new_chunk);
+            var coords_xp = array_clone(coords);
+            coords_xp[0]++;
+            var coords_xn = array_clone(coords);
+            coords_xn[0]--;
+            var coords_yp = array_clone(coords);
+            coords_yp[1]++;
+            var coords_yn = array_clone(coords);
+            coords_yn[1]--;
+            ds_list_add(model_queue, coords);
+            if(ds_list_find_index(model_queue, coords_xp)==-1 &amp;&amp; !is_undefined(world[? coords_xp]))
+                ds_list_add(model_queue, coords_xp);
+            if(ds_list_find_index(model_queue, coords_xn)==-1 &amp;&amp; !is_undefined(world[? coords_xn]))
+                ds_list_add(model_queue, coords_xn);
+            if(ds_list_find_index(model_queue, coords_yp)==-1 &amp;&amp; !is_undefined(world[? coords_yp]))
+                ds_list_add(model_queue, coords_yp);
+            if(ds_list_find_index(model_queue, coords_yn)==-1 &amp;&amp; !is_undefined(world[? coords_yn]))
+                ds_list_add(model_queue, coords_yn);
+            world_models[? coords] = chunk_model_create(world, coords);
+        }
+    }
+}
+for(var i = 0; i &lt; ds_list_size(model_queue); i++) {
+    world_models[? model_queue[| i]] = chunk_model_create(world, model_queue[| i]);
+}
+ds_list_destroy(model_queue);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
     <event eventtype="8" enumb="0">
       <action>
         <libid>1</libid>
@@ -99,8 +180,10 @@ ds_map_destroy(world_models);
           <argument>
             <kind>1</kind>
             <string>/// Draw the blocks stored in the chunks
-for(var i=-render_distance; i &lt; render_distance; i++) {
-    for(var j=-render_distance; j &lt; render_distance; j++) {
+player_chunk_x = floor(obj_player.x / 16)
+player_chunk_y = floor(obj_player.y / 16)
+for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance; i++) {
+    for(var j=player_chunk_y-render_distance; j &lt; player_chunk_y+render_distance; j++) {
         var coords;
         coords[0] = i;
         coords[1] = j;

@@ -33,7 +33,7 @@ pitch = 0;
 dir = 0;
 x = 0;
 y = 0;
-z = 2;
+z = 1;
 draw_set_color(c_white);
 </string>
           </argument>
@@ -182,7 +182,7 @@ var vect_xy = sqrt(64 - vect_z*vect_z);
 var vect_x = lengthdir_x(vect_xy, dir);
 var vect_y = lengthdir_y(vect_xy, dir);
 
-d3d_set_projection(x, y, z, x+vect_x, y+vect_y, z+vect_z, false, false, true);
+d3d_set_projection(x, y, z+1.7, x+vect_x, y+vect_y, z+1.7+vect_z, false, false, true);
 </string>
           </argument>
         </arguments>
