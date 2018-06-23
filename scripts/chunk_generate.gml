@@ -2,7 +2,7 @@
 var chunk_x = argument0;
 var chunk_y = argument1;
 var tempArray = array_create_2d(16, 16, "stone");
-tempArray[15, 15] = "stone_slab#bottom";
+tempArray[15, 15] = "stone_slab#top";
 argument2[| 0] = tempArray;
 tempArray = array_create_2d(16, 16, "grass");
 argument2[| 1] = tempArray;

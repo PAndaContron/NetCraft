@@ -14,6 +14,9 @@
  * texture_yn
  */
 var block = argument0;
+if(string_pos("#", argument0)) {
+    block = string_copy(argument0, 1, string_pos("#", argument0)-1);
+}
 var textures = array_create(6);
 ini_open("Blocks.ini");
 if(ini_key_exists(block, "texture")) {
