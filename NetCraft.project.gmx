@@ -46,6 +46,9 @@
     <script>scripts\block_get_property.gml</script>
     <script>scripts\block_get_textures.gml</script>
     <script>scripts\block_list.gml</script>
+    <script>scripts\block_covers_side.gml</script>
+    <script>scripts\block_covers_top.gml</script>
+    <script>scripts\block_covers_bottom.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\fnt_debug</font>

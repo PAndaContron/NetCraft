@@ -32,65 +32,193 @@ for(var i=255; i >= 0; i--) {
         for(var k=0; k < 16; k++) {
             if(block_get_property(layer[j, k], "texture", false) != "none") {
                 var tex_loc = tex_map[? layer[j, k]];
-                //Top
-                if(block_get_property(prev_layer[j, k], "transparent", true)) {
-                    var tex_x = tex_loc[0];
-                    d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 1);
-                }
-                //Bottom
-                if(is_undefined(next_layer) || block_get_property(next_layer[j, k], "transparent", true)) {
-                    var tex_x = tex_loc[1];
-                    d3d_model_vertex_texture(model, j, k, i, tex_x, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
-                }
-                //X+
-                if((j == 15 && block_get_property(layer_xp[0, k], "transparent", true)) || (j != 15 && block_get_property(layer[j+1, k], "transparent", true))) {
-                    var tex_x = tex_loc[2];
-                    d3d_model_vertex_texture(model, j+1, k, i, tex_x+tex_inc, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 0);
-                }
-                //Y+
-                if((k == 15 && block_get_property(layer_yp[j, 0], "transparent", true)) || (k != 15 && block_get_property(layer[j, k+1], "transparent", true))) {
-                    var tex_x = tex_loc[4];
-                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
-                }
-                //X-
-                if((j == 0 && block_get_property(layer_xn[15, k], "transparent", true)) || (j != 0 && block_get_property(layer[j-1, k], "transparent", true))) {
-                    var tex_x = tex_loc[3];
-                    d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 1);
-                    d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j, k, i+1, tex_x, 0);
-                }
-                //Y-
-                if((k == 0 && block_get_property(layer_yn[j, 15], "transparent", true)) || (k != 0 && block_get_property(layer[j, k-1], "transparent", true))) {
-                    var tex_x = tex_loc[5];
-                    d3d_model_vertex_texture(model, j, k, i, tex_x+tex_inc, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x, 0);
+                switch(block_get_property(layer[j, k], "model", false)) {
+                    case "block": {
+                        //Top
+                        if(!block_covers_side(prev_layer[j, k], 0)) {
+                            var tex_x = tex_loc[0];
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 1);
+                        }
+                        //Bottom
+                        if(is_undefined(next_layer) || !block_covers_side(next_layer[j, k], 1)) {
+                            var tex_x = tex_loc[1];
+                            d3d_model_vertex_texture(model, j, k, i, tex_x, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
+                        }
+                        //X+
+                        if((j == 15 && !block_covers_side(layer_xp[0, k], 2)) || (j != 15 && !block_covers_side(layer[j+1, k], 2))) {
+                            var tex_x = tex_loc[2];
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 0);
+                        }
+                        //Y+
+                        if((k == 15 && !block_covers_side(layer_yp[j, 0], 4)) || (k != 15 && !block_covers_side(layer[j, k+1], 4))) {
+                            var tex_x = tex_loc[4];
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                        }
+                        //X-
+                        if((j == 0 && !block_covers_side(layer_xn[15, k], 3)) || (j != 0 && !block_covers_side(layer[j-1, k], 3))) {
+                            var tex_x = tex_loc[3];
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x, 0);
+                        }
+                        //Y-
+                        if((k == 0 && !block_covers_side(layer_yn[j, 15], 5)) || (k != 0 && !block_covers_side(layer[j, k-1], 5))) {
+                            var tex_x = tex_loc[5];
+                            d3d_model_vertex_texture(model, j, k, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x, 0);
+                        }
+                    } break;
+                    case "top_half": {
+                        //Top
+                        if(!block_covers_top(prev_layer[j, k], 0)) {
+                            var tex_x = tex_loc[0];
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 1);
+                        }
+                        //Bottom
+                        if(true) {
+                            var tex_x = tex_loc[1];
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x+tex_inc, 1);
+                        }
+                        //X+
+                        if((j == 15 && !block_covers_top(layer_xp[0, k], 2)) || (j != 15 && !block_covers_top(layer[j+1, k], 2))) {
+                            var tex_x = tex_loc[2];
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 0);
+                        }
+                        //Y+
+                        if((k == 15 && !block_covers_top(layer_yp[j, 0], 4)) || (k != 15 && !block_covers_top(layer[j, k+1], 4))) {
+                            var tex_x = tex_loc[4];
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                        }
+                        //X-
+                        if((j == 0 && !block_covers_top(layer_xn[15, k], 3)) || (j != 0 && !block_covers_top(layer[j-1, k], 3))) {
+                            var tex_x = tex_loc[3];
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x, 0);
+                        }
+                        //Y-
+                        if((k == 0 && !block_covers_top(layer_yn[j, 15], 5)) || (k != 0 && !block_covers_top(layer[j, k-1], 5))) {
+                            var tex_x = tex_loc[5];
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x, .5);
+                            d3d_model_vertex_texture(model, j+1, k, i+1, tex_x, 0);
+                        }
+                    } break;
+                    case "bottom_half": {
+                        //Top
+                        if(true) {
+                            var tex_x = tex_loc[0];
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x, 1);
+                        }
+                        //Bottom
+                        if(is_undefined(next_layer) || !block_covers_bottom(next_layer[j, k], 1)) {
+                            var tex_x = tex_loc[1];
+                            d3d_model_vertex_texture(model, j, k, i, tex_x, 0);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
+                        }
+                        //X+
+                        if((j == 15 && !block_covers_bottom(layer_xp[0, k], 2)) || (j != 15 && !block_covers_bottom(layer[j+1, k], 2))) {
+                            var tex_x = tex_loc[2];
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x, .5);
+                        }
+                        //Y+
+                        if((k == 15 && !block_covers_bottom(layer_yp[j, 0], 4)) || (k != 15 && !block_covers_bottom(layer[j, k+1], 4))) {
+                            var tex_x = tex_loc[4];
+                            d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j+1, k+1, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x, .5);
+                        }
+                        //X-
+                        if((j == 0 && !block_covers_bottom(layer_xn[15, k], 3)) || (j != 0 && !block_covers_bottom(layer[j-1, k], 3))) {
+                            var tex_x = tex_loc[3];
+                            d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j, k+1, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x, .5);
+                        }
+                        //Y-
+                        if((k == 0 && !block_covers_bottom(layer_yn[j, 15], 5)) || (k != 0 && !block_covers_bottom(layer[j, k-1], 5))) {
+                            var tex_x = tex_loc[5];
+                            d3d_model_vertex_texture(model, j, k, i, tex_x+tex_inc, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j, k, i+.5, tex_x+tex_inc, .5);
+                            d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                            d3d_model_vertex_texture(model, j+1, k, i+.5, tex_x, .5);
+                        }
+                    } break;
                 }
             }
         }
