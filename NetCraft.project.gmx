@@ -3,14 +3,35 @@
   <Configs name="configs">
     <Config>Configs\Default</Config>
   </Configs>
-  <datafiles number="3" name="datafiles"/>
+  <datafiles number="4" name="datafiles">
+    <datafile>
+      <name>Blocks.ini</name>
+      <exists>-1</exists>
+      <size>0</size>
+      <exportAction>2</exportAction>
+      <exportDir></exportDir>
+      <overwrite>0</overwrite>
+      <freeData>-1</freeData>
+      <removeEnd>0</removeEnd>
+      <store>0</store>
+      <ConfigOptions>
+        <Config name="Default">
+          <CopyToMask>9223372036854775807</CopyToMask>
+        </Config>
+      </ConfigOptions>
+      <filename>Blocks.ini</filename>
+    </datafile>
+  </datafiles>
   <NewExtensions>
     <extension index="0">extensions\PointerLock</extension>
   </NewExtensions>
   <sounds name="sound"/>
   <sprites name="sprites">
     <sprite>sprites\spr_grass_top</sprite>
+    <sprite>sprites\spr_grass_side</sprite>
+    <sprite>sprites\spr_dirt</sprite>
     <sprite>sprites\spr_test</sprite>
+    <sprite>sprites\spr_stone</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
@@ -20,6 +41,11 @@
     <script>scripts\chunk_generate.gml</script>
     <script>scripts\chunk_model_create.gml</script>
     <script>scripts\array_clone.gml</script>
+    <script>scripts\blocksystem_init.gml</script>
+    <script>scripts\blocksystem_destroy.gml</script>
+    <script>scripts\block_get_property.gml</script>
+    <script>scripts\block_get_textures.gml</script>
+    <script>scripts\block_list.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\fnt_debug</font>

@@ -30,6 +30,8 @@ window_set_position(0, 0);
 window_set_size(browser_width, browser_height);
 view_wview[0] = browser_width;
 view_hview[0] = browser_height;
+if(surface_get_width(application_surface) != browser_width || surface_get_height(application_surface) != browser_height)
+    surface_resize(application_surface, browser_width, browser_height);
 </string>
           </argument>
         </arguments>

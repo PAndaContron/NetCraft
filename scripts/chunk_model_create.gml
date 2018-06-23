@@ -1,4 +1,4 @@
-///chunk_model_create(world, coords)
+///chunk_model_create(world, coords, tex_map, tex_increment)
 var model = d3d_model_create();
 var chunk = argument0[? argument1];
 var coords_xp = array_clone(argument1);
@@ -13,6 +13,8 @@ var chunk_xp = argument0[? coords_xp];
 var chunk_xn = argument0[? coords_xn];
 var chunk_yp = argument0[? coords_yp];
 var chunk_yn = argument0[? coords_yn];
+var tex_map = argument2;
+var tex_inc = argument3;
 var prev_layer = array_create_2d(16, 16, "air");
 d3d_model_primitive_begin(model, pr_trianglelist);
 for(var i=255; i >= 0; i--) {
@@ -28,60 +30,67 @@ for(var i=255; i >= 0; i--) {
     if(!is_undefined(chunk_yn)) layer_yn = chunk_yn[| i];
     for(var j=0; j < 16; j++) {
         for(var k=0; k < 16; k++) {
-            if(layer[j, k] == "grass") {
+            if(block_get_property(layer[j, k], "texture", false) != "none") {
+                var tex_loc = tex_map[? layer[j, k]];
                 //Top
-                if(prev_layer[j, k] == "air") {
-                    d3d_model_vertex_texture(model, j, k, i+1, 1, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, 0, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, 0, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, 0, 1);
+                if(block_get_property(prev_layer[j, k], "transparent", true)) {
+                    var tex_x = tex_loc[0];
+                    d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
+                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
+                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 1);
+                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 1);
                 }
                 //Bottom
-                if(is_undefined(next_layer) || next_layer[j, k] == "air") {
-                    d3d_model_vertex_texture(model, j, k, i, 0, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i, 1, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i, 0, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i, 0, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i, 1, 0);
-                    d3d_model_vertex_texture(model, j+1, k+1, i, 1, 1);
+                if(is_undefined(next_layer) || block_get_property(next_layer[j, k], "transparent", true)) {
+                    var tex_x = tex_loc[1];
+                    d3d_model_vertex_texture(model, j, k, i, tex_x, 0);
+                    d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
                 }
                 //X+
-                if((j == 15 && layer_xp[0, k] == "air") || (j != 15 && layer[j+1, k] == "air")) {
-                    d3d_model_vertex_texture(model, j+1, k, i, 0, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i, 0, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i, 0, 0);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, 1, 0);
+                if((j == 15 && block_get_property(layer_xp[0, k], "transparent", true)) || (j != 15 && block_get_property(layer[j+1, k], "transparent", true))) {
+                    var tex_x = tex_loc[2];
+                    d3d_model_vertex_texture(model, j+1, k, i, tex_x+tex_inc, 1);
+                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x, 0);
                 }
                 //Y+
-                if((k == 15 && layer_yp[j, 0] == "air") || (k != 15 && layer[j, k+1] == "air")) {
-                    d3d_model_vertex_texture(model, j+1, k+1, i, 0, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i, 0, 0);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j+1, k+1, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i, 0, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, 1, 0);
+                if((k == 15 && block_get_property(layer_yp[j, 0], "transparent", true)) || (k != 15 && block_get_property(layer[j, k+1], "transparent", true))) {
+                    var tex_x = tex_loc[4];
+                    d3d_model_vertex_texture(model, j+1, k+1, i, tex_x+tex_inc, 1);
+                    d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k+1, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j, k+1, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x, 0);
                 }
                 //X-
-                if((j == 0 && layer_xn[15, k] == "air") || (j != 0 && layer[j-1, k] == "air")) {
-                    d3d_model_vertex_texture(model, j, k+1, i, 0, 1);
-                    d3d_model_vertex_texture(model, j, k, i, 0, 0);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j, k+1, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j, k, i, 0, 0);
-                    d3d_model_vertex_texture(model, j, k, i+1, 1, 0);
+                if((j == 0 && block_get_property(layer_xn[15, k], "transparent", true)) || (j != 0 && block_get_property(layer[j-1, k], "transparent", true))) {
+                    var tex_x = tex_loc[3];
+                    d3d_model_vertex_texture(model, j, k+1, i, tex_x+tex_inc, 1);
+                    d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j, k+1, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j, k, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j, k, i+1, tex_x, 0);
                 }
                 //Y-
-                if((k == 0 && layer_yn[j, 15] == "air") || (k != 0 && layer[j, k-1] == "air")) {
-                    d3d_model_vertex_texture(model, j, k, i, 0, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i, 0, 0);
-                    d3d_model_vertex_texture(model, j, k, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j, k, i+1, 1, 1);
-                    d3d_model_vertex_texture(model, j+1, k, i, 0, 0);
-                    d3d_model_vertex_texture(model, j+1, k, i+1, 1, 0);
+                if((k == 0 && block_get_property(layer_yn[j, 15], "transparent", true)) || (k != 0 && block_get_property(layer[j, k-1], "transparent", true))) {
+                    var tex_x = tex_loc[5];
+                    d3d_model_vertex_texture(model, j, k, i, tex_x+tex_inc, 1);
+                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j, k, i+1, tex_x+tex_inc, 0);
+                    d3d_model_vertex_texture(model, j+1, k, i, tex_x, 1);
+                    d3d_model_vertex_texture(model, j+1, k, i+1, tex_x, 0);
                 }
             }
         }

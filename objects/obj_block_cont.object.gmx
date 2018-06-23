@@ -26,7 +26,49 @@
           <argument>
             <kind>1</kind>
             <string>/// Create block container data structures
-// Each chunk will be an list of arrays representing each layer
+//Initialize blocksystem
+blocksystem_init();
+
+//Prepare texture vertices
+tex_index_map = ds_map_create(); //Maps sprite indexes to their texture indexes on the surface
+var tex_set = ds_map_create();
+var blocks = block_list();
+for(var i=0; i &lt; array_length_1d(blocks); i++) {
+    var textures = block_get_textures(blocks[i]);
+    for(var j=0; j &lt; 6; j++) {
+        if(textures[j]&gt;-1) {
+            tex_set[? textures[j]] = 0;
+        }
+    }
+}
+var current = ds_map_find_first(tex_set);
+for(var i=0; i &lt; ds_map_size(tex_set); i++) {
+    tex_index_map[? current] = i;
+    current = ds_map_find_next(tex_set, current);
+}
+tex_number = ds_map_size(tex_set);
+var tex_width = 1;
+while(tex_width &lt; tex_number) {
+    tex_width *= 2;
+}
+ds_map_destroy(tex_set);
+
+tex_map = ds_map_create(); //Maps block names to their texture arrays
+for(var i=0; i &lt; array_length_1d(blocks); i++) {
+    var textures = block_get_textures(blocks[i]);
+    var indexes = array_create(6);
+    for(var j=0; j &lt; 6; j++) {
+        indexes[j] = tex_index_map[? textures[j]];
+        if(is_undefined(indexes[j])) {
+            tex_map[? blocks[i]] = undefined;
+            break;
+        }
+        indexes[j] /= tex_width;
+    }
+    tex_map[? blocks[i]] = indexes;
+}
+
+//Each chunk will be an list of arrays representing each layer
 render_distance = 8;
 world = ds_map_create();
 world_models = ds_map_create();
@@ -45,7 +87,7 @@ for(var i=-render_distance; i &lt; render_distance; i++) {
         var coords;
         coords[0] = i;
         coords[1] = j;
-        world_models[? coords] = chunk_model_create(world, coords);
+        world_models[? coords] = chunk_model_create(world, coords, tex_map, 1/tex_width);
     }
 }
 
@@ -74,7 +116,7 @@ draw_set_color(c_white);
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Free up the space taken by the chunks
+            <string>/// Free up the space taken by data structures
 var current = ds_map_find_first(world);
 for(var i = 0; i &lt; ds_map_size(world); i++) {
     ds_list_destroy(world[? current]);
@@ -83,6 +125,14 @@ for(var i = 0; i &lt; ds_map_size(world); i++) {
 }
 ds_map_destroy(world);
 ds_map_destroy(world_models);
+ds_map_destroy(tex_map);
+ds_map_destroy(tex_index_map);
+
+//Clear the texture surface
+surface_free(texture_surface);
+
+//Destroy blocksystem
+blocksystem_destroy();
 </string>
           </argument>
         </arguments>
@@ -149,14 +199,37 @@ for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance;
                 ds_list_add(model_queue, coords_yp);
             if(ds_list_find_index(model_queue, coords_yn)==-1 &amp;&amp; !is_undefined(world[? coords_yn]))
                 ds_list_add(model_queue, coords_yn);
-            world_models[? coords] = chunk_model_create(world, coords);
+            world_models[? coords] = chunk_model_create(world, coords, tex_map, 1/tex_number);
         }
     }
 }
 for(var i = 0; i &lt; ds_list_size(model_queue); i++) {
-    world_models[? model_queue[| i]] = chunk_model_create(world, model_queue[| i]);
+    world_models[? model_queue[| i]] = chunk_model_create(world, model_queue[| i], tex_map, 1/tex_number);
 }
 ds_list_destroy(model_queue);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="72">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Make sure the texture surface is there
 </string>
           </argument>
         </arguments>
@@ -180,6 +253,23 @@ ds_list_destroy(model_queue);
           <argument>
             <kind>1</kind>
             <string>/// Draw the blocks stored in the chunks
+if(is_undefined(texture_surface) || !surface_exists(texture_surface)) {
+    d3d_end();
+    var tex_width = 1;
+    while(tex_width &lt; tex_number) {
+        tex_width *= 2;
+    }
+    tex_width *= 32;
+    texture_surface = surface_create(tex_width, 32);
+    surface_set_target(texture_surface);
+    var current = ds_map_find_first(tex_index_map);
+    for(var i=0; i &lt; ds_map_size(tex_index_map); i++) {
+        draw_sprite(current, 0, tex_index_map[? current]*32,0);
+        current = ds_map_find_next(tex_index_map, current);
+    }
+    surface_reset_target();
+    d3d_start();
+}
 player_chunk_x = floor(obj_player.x / 16)
 player_chunk_y = floor(obj_player.y / 16)
 for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance; i++) {
@@ -187,7 +277,7 @@ for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance;
         var coords;
         coords[0] = i;
         coords[1] = j;
-        d3d_model_draw(world_models[? coords], i*16, j*16, 0, grass_texture);
+        d3d_model_draw(world_models[? coords], i*16, j*16, 0, surface_get_texture(texture_surface));
     }
 }
 </string>
