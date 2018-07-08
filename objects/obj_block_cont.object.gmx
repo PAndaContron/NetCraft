@@ -92,6 +92,8 @@ for(var i=-render_distance; i &lt; render_distance; i++) {
     }
 }
 
+model_queue = ds_list_create();
+
 //Set drawing information
 grass_texture = sprite_get_texture(spr_grass_top, 0);
 draw_set_color(c_white);
@@ -128,6 +130,7 @@ ds_map_destroy(world);
 ds_map_destroy(world_models);
 ds_map_destroy(tex_map);
 ds_map_destroy(tex_index_map);
+ds_list_destroy(model_queue);
 
 //Clear the texture surface
 surface_free(texture_surface);
@@ -171,7 +174,6 @@ for(var i=-render_distance; i &lt; render_distance; i++) {
     }
 }*/
 
-model_queue = ds_list_create();
 player_chunk_x = floor(obj_player.x / 16)
 player_chunk_y = floor(obj_player.y / 16)
 for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance; i++) {
@@ -200,14 +202,14 @@ for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance;
                 ds_list_add(model_queue, coords_yp);
             if(ds_list_find_index(model_queue, coords_yn)==-1 &amp;&amp; !is_undefined(world[? coords_yn]))
                 ds_list_add(model_queue, coords_yn);
-            world_models[? coords] = chunk_model_create(world, coords, tex_map, 1/tex_number);
+            ds_list_add(model_queue, coords);
         }
     }
 }
-for(var i = 0; i &lt; ds_list_size(model_queue); i++) {
-    world_models[? model_queue[| i]] = chunk_model_create(world, model_queue[| i], tex_map, 1/tex_number);
+if(ds_list_size(model_queue) &gt; 0) {
+    world_models[? model_queue[| 0]] = chunk_model_create(world, model_queue[| 0], tex_map, 1/tex_number);
+    ds_list_delete(model_queue, 0);
 }
-ds_list_destroy(model_queue);
 </string>
           </argument>
         </arguments>
