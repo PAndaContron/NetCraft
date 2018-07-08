@@ -69,6 +69,7 @@ for(var i=0; i &lt; array_length_1d(blocks); i++) {
 }
 
 //Each chunk will be an list of arrays representing each layer
+globalvar render_distance;
 render_distance = 8;
 world = ds_map_create();
 world_models = ds_map_create();
@@ -270,14 +271,47 @@ if(is_undefined(texture_surface) || !surface_exists(texture_surface)) {
     surface_reset_target();
     d3d_start();
 }
-player_chunk_x = floor(obj_player.x / 16)
-player_chunk_y = floor(obj_player.y / 16)
+var player_x = obj_player.x;
+var player_y = obj_player.y;
+var player_z = obj_player.z + 1.7;
+var fov = 45;
+var player_chunk_x = floor(player_x / 16);
+var player_chunk_y = floor(player_y / 16);
+var angle_top = obj_player.pitch + fov/2;
+var len_hor = (render_distance * 16 + 24) * tan(degtorad((fov/2) * browser_width/browser_height));
+var len_vert = (render_distance * 16 + 24) / cos(degtorad(fov/2));
+var vertices;
+vertices[0, 0] = player_x;
+vertices[0, 1] = player_y;
+
+var center_x = lengthdirpitch_x(render_distance * 16 + 24, obj_player.dir, obj_player.pitch) + player_x;
+var center_y = lengthdirpitch_y(render_distance * 16 + 24, obj_player.dir, obj_player.pitch) + player_y;
+var top_x = lengthdirpitch_x(len_vert, obj_player.dir, angle_top) + player_x;
+var top_y = lengthdirpitch_y(len_vert, obj_player.dir, angle_top) + player_y;
+var vect_xr = lengthdir_x(len_hor, obj_player.dir - 90);
+var vect_yr = lengthdir_y(len_hor, obj_player.dir - 90);
+var vect_xt = top_x - center_x;
+var vect_yt = top_y - center_y;
+
+vertices[1, 0] = center_x + vect_xr + vect_xt;
+vertices[1, 1] = center_y + vect_yr + vect_yt;
+
+vertices[2, 0] = center_x - vect_xr - vect_xt;
+vertices[2, 1] = center_y - vect_yr - vect_yt;
+
+vertices[3, 0] = center_x + vect_xr - vect_xt;
+vertices[3, 1] = center_y + vect_yr - vect_yt;
+
+vertices[4, 0] = center_x - vect_xr + vect_xt;
+vertices[4, 1] = center_y - vect_yr + vect_yt;
 for(var i=player_chunk_x-render_distance; i &lt; player_chunk_x+render_distance; i++) {
     for(var j=player_chunk_y-render_distance; j &lt; player_chunk_y+render_distance; j++) {
-        var coords;
-        coords[0] = i;
-        coords[1] = j;
-        d3d_model_draw(world_models[? coords], i*16, j*16, 0, surface_get_texture(texture_surface));
+        if((player_chunk_x == i &amp;&amp; player_chunk_y == j) || check_chunk_collision(i, j, vertices)) {
+            var coords;
+            coords[0] = i;
+            coords[1] = j;
+            d3d_model_draw(world_models[? coords], i*16, j*16, 0, surface_get_texture(texture_surface));
+        }
     }
 }
 </string>

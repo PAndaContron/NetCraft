@@ -85,7 +85,7 @@ mouse_lock_update();
 
 //Camera
 dir += -90 * global.sensitivity*(mouse_delta_x)/window_get_width();
-pitch = clamp(pitch + (90 * global.sensitivity*(mouse_delta_y)/window_get_height()), -89.8, 89.8);
+pitch = clamp(pitch + (-90 * global.sensitivity*(mouse_delta_y)/window_get_height()), -89.7, 89.7);
 
 // Movement
 var w = keyboard_check(ord("W"));
@@ -153,7 +153,10 @@ if(keyboard_check(vk_shift)) {
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 draw_set_font(fnt_debug);
-draw_text(0, 0, "FPS: " + fps + " Pos: " + x + ", " + y + ", " + z);
+var text_height = string_height("F");
+draw_text(0, 0, "FPS: " + fps);
+draw_text(0, text_height, "Pos: " + x + ", " + y + ", " + z);
+draw_text(0, text_height*2, "Facing: " + dir + "/" + pitch);
 </string>
           </argument>
         </arguments>
@@ -177,12 +180,11 @@ draw_text(0, 0, "FPS: " + fps + " Pos: " + x + ", " + y + ", " + z);
           <argument>
             <kind>1</kind>
             <string>///Draw the projection
-var vect_z = lengthdir_y(8, pitch);
-var vect_xy = sqrt(64 - vect_z*vect_z);
-var vect_x = lengthdir_x(vect_xy, dir);
-var vect_y = lengthdir_y(vect_xy, dir);
+var vect_x = lengthdirpitch_x(8, dir, pitch);
+var vect_y = lengthdirpitch_y(8, dir, pitch);
+var vect_z = lengthdirpitch_z(8, dir, pitch);
 
-d3d_set_projection(x, y, z+1.7, x+vect_x, y+vect_y, z+1.7+vect_z, false, false, true);
+d3d_set_projection_ext(x, y, z+1.7, x+vect_x, y+vect_y, z+1.7+vect_z, 0, 0, 1, 45, browser_width/browser_height, 0.01, 32000);
 </string>
           </argument>
         </arguments>

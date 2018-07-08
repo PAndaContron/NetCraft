@@ -49,6 +49,13 @@
     <script>scripts\block_covers_side.gml</script>
     <script>scripts\block_covers_top.gml</script>
     <script>scripts\block_covers_bottom.gml</script>
+    <script>scripts\chunk_in_view_2d.gml</script>
+    <script>scripts\chunk_in_view.gml</script>
+    <script>scripts\angle_in_range.gml</script>
+    <script>scripts\check_chunk_collision.gml</script>
+    <script>scripts\lengthdirpitch_x.gml</script>
+    <script>scripts\lengthdirpitch_y.gml</script>
+    <script>scripts\lengthdirpitch_z.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\fnt_debug</font>
