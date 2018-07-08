@@ -20,7 +20,7 @@ for(var c=0; c < 2; c++) {
     }
 }
 
-var edges = array_create_2d(4, 2, 0);
+var edges = array_create_2d(8, 2, 0);
 
 edges[0, 0] = (vertices[1, 0] - vertices[0, 0]) / point_distance(vertices[0, 0], vertices[0, 1], vertices[1, 0], vertices[1, 1]);
 edges[0, 1] = (vertices[1, 1] - vertices[0, 1]) / point_distance(vertices[0, 0], vertices[0, 1], vertices[1, 0], vertices[1, 1]);
@@ -34,6 +34,18 @@ edges[2, 1] = (vertices[3, 1] - vertices[0, 1]) / point_distance(vertices[0, 0],
 edges[3, 0] = (vertices[4, 0] - vertices[0, 0]) / point_distance(vertices[0, 0], vertices[0, 1], vertices[4, 0], vertices[4, 1]);
 edges[3, 1] = (vertices[4, 1] - vertices[0, 1]) / point_distance(vertices[0, 0], vertices[0, 1], vertices[4, 0], vertices[4, 1]);
 
+edges[4, 0] = (vertices[3, 0] - vertices[1, 0]) / point_distance(vertices[1, 0], vertices[1, 1], vertices[3, 0], vertices[3, 1]);
+edges[4, 1] = (vertices[3, 1] - vertices[1, 1]) / point_distance(vertices[1, 0], vertices[1, 1], vertices[3, 0], vertices[3, 1]);
+
+edges[5, 0] = (vertices[4, 0] - vertices[1, 0]) / point_distance(vertices[1, 0], vertices[1, 1], vertices[4, 0], vertices[4, 1]);
+edges[5, 1] = (vertices[4, 1] - vertices[1, 1]) / point_distance(vertices[1, 0], vertices[1, 1], vertices[4, 0], vertices[4, 1]);
+
+edges[6, 0] = (vertices[3, 0] - vertices[2, 0]) / point_distance(vertices[2, 0], vertices[2, 1], vertices[3, 0], vertices[3, 1]);
+edges[6, 1] = (vertices[3, 1] - vertices[2, 1]) / point_distance(vertices[2, 0], vertices[2, 1], vertices[3, 0], vertices[3, 1]);
+
+edges[7, 0] = (vertices[4, 0] - vertices[2, 0]) / point_distance(vertices[2, 0], vertices[2, 1], vertices[4, 0], vertices[4, 1]);
+edges[7, 1] = (vertices[4, 1] - vertices[2, 1]) / point_distance(vertices[2, 0], vertices[2, 1], vertices[4, 0], vertices[4, 1]);
+
 for(var i = 0; i < 4; i++) {
     var proj = array_create(4);
     proj[0] = dot_product(chunk_x - vertices[0, 0], chunk_y - vertices[0, 1], edges[i, 0], edges[i, 1]);
@@ -43,6 +55,48 @@ for(var i = 0; i < 4; i++) {
     var above = false, between = false, below = false;
     for(var j = 0; j < 4; j++) {
         if(proj[j] > point_distance(vertices[0, 0], vertices[0, 1], vertices[i+1, 0], vertices[i+1, 1])) {
+            above = true;
+        } else if(proj[j] < 0) {
+            below = true;
+        } else {
+            between = true;
+        }
+    }
+    if((above && !between && !below) || (!above && !between && below)) {
+        return false;
+    }
+}
+
+for(var i = 4; i < 6; i++) {
+    var proj = array_create(4);
+    proj[0] = dot_product(chunk_x - vertices[1, 0], chunk_y - vertices[1, 1], edges[i, 0], edges[i, 1]);
+    proj[1] = dot_product(chunk_x - vertices[1, 0] + 16, chunk_y - vertices[1, 1], edges[i, 0], edges[i, 1]);
+    proj[2] = dot_product(chunk_x - vertices[1, 0], chunk_y - vertices[1, 1] + 16, edges[i, 0], edges[i, 1]);
+    proj[3] = dot_product(chunk_x - vertices[1, 0] + 16, chunk_y - vertices[1, 1] + 16, edges[i, 0], edges[i, 1]);
+    var above = false, between = false, below = false;
+    for(var j = 0; j < 4; j++) {
+        if(proj[j] > point_distance(vertices[1, 0], vertices[1, 1], vertices[i-1, 0], vertices[i-1, 1])) {
+            above = true;
+        } else if(proj[j] < 0) {
+            below = true;
+        } else {
+            between = true;
+        }
+    }
+    if((above && !between && !below) || (!above && !between && below)) {
+        return false;
+    }
+}
+
+for(var i = 6; i < 8; i++) {
+    var proj = array_create(4);
+    proj[0] = dot_product(chunk_x - vertices[2, 0], chunk_y - vertices[2, 1], edges[i, 0], edges[i, 1]);
+    proj[1] = dot_product(chunk_x - vertices[2, 0] + 16, chunk_y - vertices[2, 1], edges[i, 0], edges[i, 1]);
+    proj[2] = dot_product(chunk_x - vertices[2, 0], chunk_y - vertices[2, 1] + 16, edges[i, 0], edges[i, 1]);
+    proj[3] = dot_product(chunk_x - vertices[2, 0] + 16, chunk_y - vertices[2, 1] + 16, edges[i, 0], edges[i, 1]);
+    var above = false, between = false, below = false;
+    for(var j = 0; j < 4; j++) {
+        if(proj[j] > point_distance(vertices[2, 0], vertices[2, 1], vertices[i-3, 0], vertices[i-3, 1])) {
             above = true;
         } else if(proj[j] < 0) {
             below = true;
